@@ -1,9 +1,11 @@
 import numpy as np
 import numpy.fft as fft
-from tutorial import mongtest
+from py.com import mongtest
 from datetime import datetime
-from tutorial import constant
+from py.com import constant
 from datetime import timedelta
+from py.com import stock_bean
+
 
 def calc_periodicity(data, temporal_window=42014.0, debug=False, tryCount=1):
     length = len(data)
@@ -21,9 +23,7 @@ def calc_periodicity(data, temporal_window=42014.0, debug=False, tryCount=1):
     if debug:
         index_value = np.argmax(a)
         while abs(index_value - 12) != 1:
-            tryCount = tryCount + 1
-            suggest_value = suggest_value + 2000
-            index_value = calc_periodicity(data, suggest_value, True, tryCount)
+            index_value = calc_periodicity(data, suggest_value + 2000, True, tryCount + 1)
         print("calculate suggest value is " % suggest_value)
         print("Actual index is" % np.argmax(a))
     print("Peak found at %s second period" % int(xt[np.argmax(a)]))
@@ -35,50 +35,87 @@ def calc_periodicity(data, temporal_window=42014.0, debug=False, tryCount=1):
     return int(xt[np.argmax(a)])
 
 
-def periodic_prediction(period, data, code, count=1):
+def periodic_prediction(period, data, code, type, count=1):
     print('---------- start periodic_prediction ----------')
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = datetime.now().strftime(constant.date_format)
+    new_period_value = list()
     predict_result = {
         "periodic": period,  # 周期
         "code": code,  # 股票代码
         "date": today,
-        "periodid_type": 1
+        "periodid_type": type,
+        "new_predict_value": new_period_value
     }
-    total_size = data.size
+    weekday = datetime.now().weekday()
+
+    for i in range(count):
+        if weekday == 4 or weekday == 5 or weekday == 6:
+            i = (7 - weekday) + i
+        cal_periodic(data, i, new_period_value, type)
+    return predict_result
+
+
+def periodic_date(count):
+    today = datetime.now()
+    today = today + timedelta(days=count)
+    return today.strftime(constant.date_format)
+
+
+def cal_periodic(data, count, new_period_value, type):
+    total_size = data.get_size(type)
     cur_periodic_value = total_size % period
     old_period_value = list()
-    start_index = cur_periodic_value
+    start_index = cur_periodic_value + count
     while start_index < total_size:
-        old_period_value.append(data[start_index])
+        temp_period_old_value = {}
+        temp_period_old_value['price'] = data.get_price_array(type)[start_index]
+        temp_period_old_value['date'] = data.get_date_array(type)[start_index]
+        old_period_value.append(temp_period_old_value)
         start_index = start_index + period
-    predict_result['old_periodix'] = old_period_value
     if len(old_period_value) == 1:
-        return old_period_value[0]
+        temp_period_value = {
+            "date": periodic_date(count),
+            "price": np.average(old_period_value),
+            "old_period": old_period_value
+        }
+        new_period_value.append(temp_period_value)
     else:
         first_value = 0
         for old_value in old_period_value:
             if first_value == 0:
-                first_value = old_value
-            elif abs(first_value - old_value) / first_value > 0.1:
-                print('error big distance value ' % abs(first_value - old_value) / first_value)
-        temp_period_value = {}
-        predict_result['new_predict_value'] = np.average(old_period_value)
-        return predict_result
-
-
-def periodic_date(count):
-    today = datetime.now().strftime("%Y-%m-%d")
-    if count == 1:
-        return today
-    else:
-        new_day = today + timedelta(days=count -1)
-        week = new_day.weekday()
-
+                first_value = old_value['price']
+            elif abs(first_value - old_value['price']) / first_value > 0.1:
+                print('error big distance value ' % (abs(first_value - old_value['price']) / first_value))
+        price = list()
+        for old_price in old_period_value:
+            price.append(old_price['price'])
+        temp_period_value = {
+            "date": periodic_date(count),
+            "price": np.average(price),
+            "old_periodix": old_period_value
+        }
+        new_period_value.append(temp_period_value)
 
 
 dao = mongtest.StockDao()
-stock_data = mongtest.StockDao.get_stock_array(dao)
-#  init value 42014
-period = calc_periodicity(stock_data, 46014)
-result = periodic_prediction(period, stock_data,constant.stock_code)
-print(result)
+stock_data = mongtest.StockDao.get_stock_array(dao, constant.db_database, constant.db_tushare_collection)
+# #  init value 42014
+period = calc_periodicity(stock_data.get_price_array(constant.type_open), 46014)
+document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_open,3)
+dao.insert_predict_value(constant.db_database,constant.db_forecast_collection,document)
+print(document)
+
+
+period = calc_periodicity(stock_data.get_price_array(constant.type_high), 46014)
+document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_high,3)
+dao.insert_predict_value(constant.db_database,constant.db_forecast_collection,document)
+print(document)
+
+
+period = calc_periodicity(stock_data.get_price_array(constant.type_three), 46014)
+document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_three,3)
+dao.insert_predict_value(constant.db_database,constant.db_forecast_collection,document)
+print(document)
+
+
+
