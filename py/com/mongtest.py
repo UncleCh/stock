@@ -57,15 +57,14 @@ class StockDao:
             open_close_list.append((item['open'] + item['close']) / 2.0)
         date_array = np.array(date_list)
         stock = stock_bean.stock()
-        stock.setdate(np.array(open_close_high),date_array,constant.type_open)
-        stock.setdate(np.array(high_list),date_array,constant.type_open)
+        stock.setdate(np.array(open_close_high),date_array,constant.type_three)
+        stock.setdate(np.array(high_list),date_array,constant.type_high)
         stock.setdate(np.array(open_close_high),date_array,constant.type_open)
         return stock
 
     def insert_predict_value(self, db, collection, document):
-        predict_collection = self.get_collection(self, db, collection)
+        predict_collection = self.get_collection(db, collection)
         predict_collection.insert_one(document)
-
 
         # dao = StockDao()
         # stock_data = StockDao.get_stock_array(dao,constant.db_database,constant.db_tushare_collection)
