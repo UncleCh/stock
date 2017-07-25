@@ -97,25 +97,79 @@ def cal_periodic(data, count, new_period_value, type):
         new_period_value.append(temp_period_value)
 
 
+def periodic_prediction_bypercent(period, data, code, type, count=5):
+    print('---------- start periodic_prediction ----------')
+    today = datetime.now().strftime(constant.date_format)
+    new_period_value = list()
+    predict_result = {
+        "periodic": period,  # 周期
+        "code": code,  # 股票代码
+        "date": today,
+        "periodid_type": type
+    }
+    cal_periodic_bypercent(data, predict_result, type, count)
+    return predict_result
+
+
+def cal_periodic_bypercent(data, new_period_value, type, count):
+    total_size = data.get_size(type)
+    cur_periodic_value = total_size % period
+    new_period_value['new_predict_value'] = list()
+    start_index = cur_periodic_value
+    while start_index < total_size:
+        old_period_value = {}
+        old_period_value['date'] = data.get_date_array(type)[start_index]
+        temp_percent_list = list()
+        for i in range(count):
+            percent = (data.get_price_array(type)[start_index + i + 1] - data.get_price_array(type)[start_index + i]) / \
+                      data.get_price_array(type)[start_index + i + 1]
+            temp_percent_list.append(percent)
+        old_period_value['percent'] = temp_percent_list
+        new_period_value['new_predict_value'].append(old_period_value)
+        start_index = start_index + period
+    # if len(old_period_value) == 1:
+    #     temp_period_value = {
+    #         "date": periodic_date(count),
+    #         "price": np.average(old_period_value),
+    #         "old_period": old_period_value
+    #     }
+    # else:
+    #     first_value = 0
+    #     for old_value in old_period_value:
+    #         if first_value == 0:
+    #             first_value = old_value['price']
+    #         elif abs(first_value - old_value['price']) / first_value > 0.1:
+    #             print('error big distance value ' % (abs(first_value - old_value['price']) / first_value))
+    #     price = list()
+    #     for old_price in old_period_value:
+    #         price.append(old_price['price'])
+    #     temp_period_value = {
+    #         "date": periodic_date(count),
+    #         "price": np.average(price),
+    #         "old_periodix": old_period_value
+    #     }
+
+
 dao = mongtest.StockDao()
 stock_data = mongtest.StockDao.get_stock_array(dao, constant.db_database, constant.db_tushare_collection)
 # #  init value 42014
-period = calc_periodicity(stock_data.get_price_array(constant.type_open), 46014)
-document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_open,3)
-dao.insert_predict_value(constant.db_database,constant.db_forecast_collection,document)
-print(document)
+# period = calc_periodicity(stock_data.get_price_array(constant.type_open), 46014)
+# document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_open, 3)
+# dao.insert_predict_value(constant.db_database, constant.db_forecast_collection, document)
+# print(document)
+#
+# period = calc_periodicity(stock_data.get_price_array(constant.type_high), 46014)
+# document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_high, 3)
+# dao.insert_predict_value(constant.db_database, constant.db_forecast_collection, document)
+# print(document)
 
-
-period = calc_periodicity(stock_data.get_price_array(constant.type_high), 46014)
-document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_high,3)
-dao.insert_predict_value(constant.db_database,constant.db_forecast_collection,document)
-print(document)
+# period = calc_periodicity(stock_data.get_price_array(constant.type_three), 46014)
+# document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_three, 3)
+# dao.insert_predict_value(constant.db_database, constant.db_forecast_collection, document)
+# print(document)
 
 
 period = calc_periodicity(stock_data.get_price_array(constant.type_three), 46014)
-document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_three,3)
-dao.insert_predict_value(constant.db_database,constant.db_forecast_collection,document)
+document = periodic_prediction_bypercent(period, stock_data, constant.stock_code, constant.type_three)
+# dao.insert_predict_value(constant.db_database, constant.db_forecast_collection, document)
 print(document)
-
-
-
