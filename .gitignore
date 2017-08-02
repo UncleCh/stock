@@ -1,9 +1,8 @@
 # IntelliJ specific files/directories
 out
 .idea
-*.ipr
-*.iws
-*.iml
+*.pyc
+
 atlassian-ide-plugin.xml
 
 # Eclipse specific files/directories
@@ -12,3 +11,4 @@ atlassian-ide-plugin.xml
 .settings
 .metadata
 bin/
+

@@ -1,18 +1,22 @@
 class stock:
-
     __prices_dict = {}
 
-    def setdate(self,price_array,date_array,type):
-        data_list = list()
-        data_list.append(price_array)
-        data_list.append(date_array)
-        self.__prices_dict[type] =data_list
+    def setdate(self, price_array, date_array, percent_array, type):
+        self.__prices_dict['date_array'] = date_array
+        self.__prices_dict['percent_array'] = percent_array
+        self.__prices_dict[type] = price_array
 
-    def get_price_array(self,type):
-        return self.__prices_dict.get(type)[0]
+    def add_price_data(self,price_array,type):
+        self.__prices_dict[type] = price_array
 
-    def get_date_array(self,type):
-        return self.__prices_dict.get(type)[1]
+    def get_price_array(self, type):
+        return self.__prices_dict.get(type)
 
-    def get_size(self,type):
-        return len(self.get_price_array(type))
+    def get_date_array(self):
+        return self.__prices_dict.get("date_array")
+
+    def get_percent_array(self):
+        return self.__prices_dict.get('percent_array')
+
+    def get_size(self):
+        return len(self.get_date_array())
