@@ -7,6 +7,6 @@ type_three = 3 # open + close + high / 3
 db_host = "118.190.136.46"
 db_port = 27017
 db_database = "stock"
-db_tushare_collection = "tushare_stock"
 db_ali_collection="ali_stock"
+stock_list="stock_list"
 db_forecast_collection = "forecast"

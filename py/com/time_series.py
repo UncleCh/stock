@@ -24,7 +24,7 @@ def calc_periodicity(data, temporal_window=42014.0, debug=False, tryCount=1):
         index_value = np.argmax(a)
         while abs(index_value - 12) > 1:
             index_value = calc_periodicity(data, suggest_value + 2000, True, tryCount + 1)
-        print("calculate suggest value is " ,temporal_window)
+        print("calculate suggest value is ", temporal_window)
         print("Actual index is" % np.argmax(a))
     print("Peak found at %s second period" % int(xt[np.argmax(a)]))
     # plt.subplot(211)
@@ -160,25 +160,25 @@ def cal_continue_percent(period, data, code, percent=0.1):
 
 
 dao = mongtest.StockDao()
-stock_data = mongtest.StockDao.get_stock_array(dao, constant.db_database, constant.db_ali_collection)
-# #  init value 42014
-# period = calc_periodicity(stock_data.get_price_array(constant.type_open), 46014)
-# document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_open, 3)
-# dao.insert_predict_value(constant.db_database, constant.db_forecast_collection, document)
-# print(document)
+result = mongtest.StockDao.get_stock_list(dao, constant.db_database, constant.stock_list)
+for code in result:
+    stock_data = mongtest.StockDao.get_stock_array(dao, constant.db_database, constant.db_ali_collection, code)
+    if (stock_data.get_size() != 0):
+    # #  init value 42014
+        period = calc_periodicity(stock_data.get_price_array(constant.type_open), 42014, True)
+        document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_open, 3)
+        dao.insert_predict_value(constant.db_database, constant.db_forecast_collection, document)
+        print(document)
 #
 # period = calc_periodicity(stock_data.get_price_array(constant.type_high), 46014)
 # document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_high, 3)
 # dao.insert_predict_value(constant.db_database, constant.db_forecast_collection, document)
 # print(document)
 
-# period = calc_periodicity(stock_data.get_price_array(constant.type_three), 46014)
-# document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_three, 3)
-# dao.insert_predict_value(constant.db_database, constant.db_forecast_collection, document)
-# print(document)
 
 
-period = calc_periodicity(stock_data.get_price_array(constant.type_open), 42014,True)
+
+period = calc_periodicity(stock_data.get_price_array(constant.type_open), 42014, True)
 
 
 # 加上时间限制 ，计算一个月内获取的最大回报
