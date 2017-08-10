@@ -11,8 +11,6 @@ from py.com import stock_bean
 
 
 class StockDao:
-
-
     def get_collection(self, db, collection):
         client = MongoClient(constant.db_host, constant.db_port)
         db = client[db]
@@ -43,7 +41,7 @@ class StockDao:
         stock.setdate(np.array(open_close_high), date_array, percent_array, constant.type_three)
         stock.add_price_data(np.array(high_list), constant.type_high)
         stock.add_price_data(np.array(open_close_high), constant.type_three)
-        stock.add_price_data(np.array(open_close_high), constant.type_open)
+        stock.add_price_data(np.array(open_close_list), constant.type_open)
         return stock
 
     def get_stock_list(self, db, collection):
@@ -59,8 +57,9 @@ class StockDao:
         predict_collection.insert_one(document)
 
 
-dao = StockDao()
-result = StockDao.get_stock_list(dao, constant.db_database, constant.stock_list)
-for code in result:
-    stock_data = StockDao.get_stock_array(dao, constant.db_database, constant.db_ali_collection, 600129.0)
-    print(stock_data)
+# dao = StockDao()
+# result = StockDao.get_stock_list(dao, constant.db_database, constant.stock_list)
+# for code in result:
+#     stock_data = StockDao.get_stock_array(dao, constant.db_database, constant.db_ali_collection, float(code))
+#     if (stock_data.get_size() != 0):
+#         print(stock_data)

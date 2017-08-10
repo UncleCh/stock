@@ -62,7 +62,7 @@ def periodic_date(count):
 
 
 def cal_periodic(data, count, new_period_value, type):
-    total_size = data.get_size(type)
+    total_size = data.get_size()
     cur_periodic_value = total_size % period
     old_period_value = list()
     start_index = cur_periodic_value + count
@@ -161,15 +161,16 @@ def cal_continue_percent(period, data, code, percent=0.1):
 
 dao = mongtest.StockDao()
 result = mongtest.StockDao.get_stock_list(dao, constant.db_database, constant.stock_list)
+
 for code in result:
-    stock_data = mongtest.StockDao.get_stock_array(dao, constant.db_database, constant.db_ali_collection, code)
-    if (stock_data.get_size() != 0):
-    # #  init value 42014
-        period = calc_periodicity(stock_data.get_price_array(constant.type_open), 42014, True)
-        document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_open, 3)
-        dao.insert_predict_value(constant.db_database, constant.db_forecast_collection, document)
-        print(document)
-#
+    stock_data = mongtest.StockDao.get_stock_array(dao, constant.db_database, constant.db_ali_collection, float(code))
+#     if (stock_data.get_size() != 0):
+#         # #  init value 42014
+#         period = calc_periodicity(stock_data.get_price_array(constant.type_open), 42014, True)
+#         # document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_open, 3)
+#         dao.insert_predict_value(constant.db_database, constant.db_forecast_collection,
+#                                  {"code": code, "period": period})
+# #
 # period = calc_periodicity(stock_data.get_price_array(constant.type_high), 46014)
 # document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_high, 3)
 # dao.insert_predict_value(constant.db_database, constant.db_forecast_collection, document)
@@ -178,11 +179,8 @@ for code in result:
 
 
 
-period = calc_periodicity(stock_data.get_price_array(constant.type_open), 42014, True)
+# period = calc_periodicity(stock_data.get_price_array(constant.type_open), 42014, True)
 
 
 # 加上时间限制 ，计算一个月内获取的最大回报
-# document = cal_continue_percent(period, stock_data, 46014)
-# document = periodic_prediction_bypercent(period, stock_data, constant.stock_code, constant.type_three)
-# dao.insert_predict_value(constant.db_database, constant.db_forecast_collection, document)
-# print(document)
+
