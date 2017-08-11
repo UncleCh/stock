@@ -160,16 +160,16 @@ def cal_continue_percent(period, data, code, percent=0.1):
 
 
 dao = mongtest.StockDao()
-result = mongtest.StockDao.get_stock_list(dao, constant.db_database, constant.stock_list)
+result = mongtest.StockDao.get_stock_list(dao, constant.db_database, constant.db_collection_config)
 
 for code in result:
     stock_data = mongtest.StockDao.get_stock_array(dao, constant.db_database, constant.db_ali_collection, float(code))
-#     if (stock_data.get_size() != 0):
-#         # #  init value 42014
-#         period = calc_periodicity(stock_data.get_price_array(constant.type_open), 42014, True)
-#         # document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_open, 3)
-#         dao.insert_predict_value(constant.db_database, constant.db_forecast_collection,
-#                                  {"code": code, "period": period})
+    if (stock_data.get_size() != 0):
+        # #  init value 42014
+        period = calc_periodicity(stock_data.get_price_array(constant.type_open), 42014, True)
+        # document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_open, 3)
+        dao.insert_predict_value(constant.db_database, constant.db_forecast_collection,
+                                 {"code": code, "period": period})
 # #
 # period = calc_periodicity(stock_data.get_price_array(constant.type_high), 46014)
 # document = periodic_prediction(period, stock_data, constant.stock_code, constant.type_high, 3)

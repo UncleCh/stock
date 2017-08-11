@@ -46,11 +46,10 @@ class StockDao:
 
     def get_stock_list(self, db, collection):
         stock_collection = self.get_collection(db, collection)
-        rows = stock_collection.find().sort([("date", DESCENDING)])
-        data_list = list()
+        rows = stock_collection.find()
         for item in rows:
-            data_list.append(item['code'])
-        return data_list
+            return item['catched']
+
 
     def insert_predict_value(self, db, collection, document):
         predict_collection = self.get_collection(db, collection)
@@ -58,7 +57,7 @@ class StockDao:
 
 
 # dao = StockDao()
-# result = StockDao.get_stock_list(dao, constant.db_database, constant.stock_list)
+# result = StockDao.get_stock_list(dao, constant.db_database, "config")
 # for code in result:
 #     stock_data = StockDao.get_stock_array(dao, constant.db_database, constant.db_ali_collection, float(code))
 #     if (stock_data.get_size() != 0):

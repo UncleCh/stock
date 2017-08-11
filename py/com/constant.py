@@ -9,4 +9,5 @@ db_port = 27017
 db_database = "stock"
 db_ali_collection="ali_stock"
 stock_list="stock_list"
+db_collection_config="config"
 db_forecast_collection = "forecast"
